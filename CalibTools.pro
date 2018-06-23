@@ -1,4 +1,7 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    camera
+    camera \
+    mainwindow
+
+CONFIG += ordered

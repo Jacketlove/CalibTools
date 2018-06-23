@@ -6,9 +6,10 @@
 
 QT       += widgets opengl testlib
 
-TARGET = camera
+TARGET   = camera
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG  += staticlib
+DESTDIR  = ../lib
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -39,16 +40,17 @@ LIBS += -L$$PWD/pylon/lib/x64 \
 #--------------------------------------------Basler End---------------------------------------
 
 #--------------------------------------------Opencv-------------------------------------------
+#自定义变量用$${},环境变量用$$()
 OPENCV_PATH  = D:\opencv
 INCLUDEPATH += $${OPENCV_PATH}\build\include
 INCLUDEPATH += $${OPENCV_PATH}\build\include\opencv2
 INCLUDEPATH += $${OPENCV_PATH}\build\include\opencv
 
 CONFIG(debug, debug|release) {
-LIBS += $$(OPENCV_PATH)\build\x64\vc15\lib\opencv_world341d.lib
+LIBS += $${OPENCV_PATH}\build\x64\vc15\lib\opencv_world341d.lib
 }
 else {
-LIBS += $$(OPENCV_PATH)\build\x64\vc15\lib\opencv_world341.lib
+LIBS += $${OPENCV_PATH}\build\x64\vc15\lib\opencv_world341.lib
 }
 #--------------------------------------------Opencv End---------------------------------------
 

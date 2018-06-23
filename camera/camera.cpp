@@ -19,34 +19,47 @@
 ///     这个模式很特别，只有当 CInstantCamera::RetrieveResult() 被调用后才会采集图像。USB 相机不支持这种
 ///     策略。
 
-
 Camera::Camera()
+{
+    qsFilePath = QDir::homePath() + "/" + "images/";
+    qsFilePrefix = "capture";
+}
+
+Camera::~Camera()
 {
 
 }
 
 int Camera::Open()
 {
-    CTlFactory& TlFactory = CTlFactory::GetInstance();
-    IGigETransportLayer* pTl = static_cast<Pylon::IGigETransportLayer*> (TlFactory.CreateTl("BaslerGigE"));
-    IPylonDevice * pDevice = pTl->CreateFirstDevice();
-    CBaslerGigEInstantCamera tempCamera(pDevice);
-    this->m_camera = &tempCamera;
+    PylonInitialize();
     try{
+        // Only look for cameras supported by Camera_t
+        CDeviceInfo info;
+        info.SetDeviceClass( Camera_t::DeviceClass());
+        // Create an instant camera object with the first found camera device matching the specified device class.
+        m_camera = new Camera_t( CTlFactory::GetInstance().CreateFirstDevice( info));
         m_camera->Open();
+        qDebug("Open Camera Successful");
+        m_camera->PixelFormat.SetValue(PixelFormat_Mono8);    ///<设置相机传输的像素数据的格式。
+        m_camera->Width.SetValue(2064);     ///<相机的兴趣区的宽度（以像素为单位）。
+        m_camera->Height.SetValue(1544);    ///<相机的兴趣区的高度（以像素为单位）
+        m_camera->TriggerSelector.SetValue(TriggerSelector_FrameStart);
+        m_camera->TriggerMode.SetValue(TriggerMode_Off);
+        m_camera->ExposureMode.SetValue(ExposureMode_Timed);
+        m_camera->ExposureTimeAbs.SetValue(5000.0);
+        m_camera->GevStreamChannelSelector.SetValue(GevStreamChannelSelector_StreamChannel0);
+        ///所选数据流通道上的每个数据包的传输之间的延迟。
+        ///所选数据流通道上的每个数据包的传输之间的延迟。以 tick 为单位测量延迟。
+        m_camera->GevSCPD.SetValue(350);
+        m_camera->AcquisitionFrameRateAbs.SetValue(50);
+        m_camera->AcquisitionFrameRateEnable.SetValue(true);
+        return CAMERA_OK;
     }catch(GenICam::GenericException e){
         qDebug("Open Camera Fail");
         qDebug(e.GetDescription());
         return CAMERA_FAIL;
     }
-    m_camera->PixelFormat.SetValue(PixelFormat_Mono8);    ///<设置相机传输的像素数据的格式。
-    m_camera->Width.SetValue(2064);     ///<相机的兴趣区的宽度（以像素为单位）。
-    m_camera->Height.SetValue(1544);    ///<相机的兴趣区的高度（以像素为单位）
-    m_camera->TriggerSelector.SetValue(TriggerSelector_FrameStart);
-    m_camera->TriggerMode.SetValue(TriggerMode_Off);
-    m_camera->ExposureMode.SetValue(ExposureMode_Timed);
-    m_camera->ExposureTimeAbs.SetValue(5000.0);
-    return CAMERA_OK;
 }
 
 bool Camera::IsOpen()
@@ -56,24 +69,29 @@ bool Camera::IsOpen()
 
 int Camera::Close()
 {
+    if( true == m_camera->IsGrabbing() ){
+        m_camera->StopGrabbing();
+    }
     if( false == m_camera->IsOpen() )
     {
         return CAMERA_FAIL;
     }
     try {
-        if(m_camera->IsOpen()) {
+        if( m_camera->IsOpen() )
+        {
             m_camera->DetachDevice();
             m_camera->Close();
         }
+        PylonTerminate();
+        return CAMERA_OK;
     } catch (GenICam::GenericException e) {
         qDebug("Close Camera Fail");
         qDebug(e.GetDescription());
         return CAMERA_FAIL;
     }
-    return CAMERA_OK;
 }
 
-void Camera::setGainAuto( GainAutoEnums gainAuto )
+void Camera::SetGainAuto( GainAutoEnums gainAuto )
 {
     m_camera->GainAuto.SetValue( gainAuto );
 }
@@ -83,7 +101,7 @@ GainAutoEnums Camera::GetGainAuto( )
     return m_camera->GainAuto.GetValue();
 }
 
-void Camera::setGainSelector( GainSelectorEnums gainAuto )
+void Camera::SetGainSelector( GainSelectorEnums gainAuto )
 {
     m_camera->GainSelector.SetValue( gainAuto );
 }
@@ -94,143 +112,143 @@ GainSelectorEnums Camera::GetGainSelector( )
 }
 
 ///***************************AOI CONFIG*********************************///
-void Camera::setWidth( int64_t width )
+void Camera::SetWidth( int64_t width )
 {
     m_camera->Width.SetValue( width );
 }
 
-int64_t Camera::getWidth()
+int64_t Camera::GetWidth()
 {
     return m_camera->Width.GetValue();
 }
 
-void Camera::setHeight(int64_t height )
+void Camera::SetHeight(int64_t height )
 {
     m_camera->Height.SetValue( height );
 }
 
-int64_t Camera::getHeight()
+int64_t Camera::GetHeight()
 {
     return m_camera->Height.GetValue();
 }
 
-void Camera::setOffsetX(int64_t offsetX )
+void Camera::SetOffsetX(int64_t offsetX )
 {
     m_camera->OffsetX.SetValue( offsetX );
 }
 
-int64_t Camera::getOffsetX()
+int64_t Camera::GetOffsetX()
 {
     return m_camera->OffsetX.GetValue();
 }
 
-void Camera::setOffsetY(int64_t offsetY )
+void Camera::SetOffsetY(int64_t offsetY )
 {
     m_camera->OffsetY.SetValue( offsetY );
 }
 
-int64_t Camera::getOffsetY()
+int64_t Camera::GetOffsetY()
 {
     return m_camera->OffsetY.GetValue();
 }
 
 ///***************************Trigger CONFIG*********************************///
-void Camera::setTriggerSelector( TriggerSelectorEnums triggerSelector )
+void Camera::SetTriggerSelector( TriggerSelectorEnums triggerSelector )
 {
     m_camera->TriggerSelector.SetValue( triggerSelector );
 }
 
-TriggerSelectorEnums Camera::getTriggerSelector()
+TriggerSelectorEnums Camera::GetTriggerSelector()
 {
     return m_camera->TriggerSelector.GetValue();
 }
 
-void Camera::setTriggerMode( TriggerModeEnums triggerMode )
+void Camera::SetTriggerMode( TriggerModeEnums triggerMode )
 {
     m_camera->TriggerMode.SetValue(triggerMode);
 }
 
-TriggerModeEnums Camera::getTriggerMode()
+TriggerModeEnums Camera::GetTriggerMode()
 {
     return m_camera->TriggerMode.GetValue();
 }
 
-void Camera::setTriggerSource( TriggerSourceEnums triggerSource )
+void Camera::SetTriggerSource( TriggerSourceEnums triggerSource )
 {
     m_camera->TriggerSource.SetValue( triggerSource );
 }
 
-TriggerSourceEnums Camera::getTriggerSource()
+TriggerSourceEnums Camera::GetTriggerSource()
 {
     return m_camera->TriggerSource.GetValue();
 }
 
-void Camera::setTriggerActivation( TriggerActivationEnums triggerActivation )
+void Camera::SetTriggerActivation( TriggerActivationEnums triggerActivation )
 {
     m_camera->TriggerActivation.SetValue( triggerActivation );
 }
 
-TriggerActivationEnums Camera::getTriggerActivation()
+TriggerActivationEnums Camera::GetTriggerActivation()
 {
     return m_camera->TriggerActivation.GetValue();
 }
 
-void Camera::setTrigger(TriggerSelectorEnums triggerSelector, \
+void Camera::SetTrigger(TriggerSelectorEnums triggerSelector, \
                         TriggerModeEnums triggerMode, \
                         TriggerSourceEnums triggerSource, \
                         TriggerActivationEnums triggerActivation)
 {
-    setTriggerSelector(triggerSelector);
-    setTriggerMode(triggerMode);
-    setTriggerSource(triggerSource);
-    setTriggerActivation(triggerActivation);
+    SetTriggerSelector(triggerSelector);
+    SetTriggerMode(triggerMode);
+    SetTriggerSource(triggerSource);
+    SetTriggerActivation(triggerActivation);
 }
 
-void Camera::getTrigger(TriggerSelectorEnums *triggerSelector, \
+void Camera::GetTrigger(TriggerSelectorEnums *triggerSelector, \
                         TriggerModeEnums *triggerMode, \
                         TriggerSourceEnums *triggerSource, \
                         TriggerActivationEnums *triggerActivation)
 {
-    *triggerSelector = getTriggerSelector();
-    *triggerMode = getTriggerMode();
-    *triggerSource = getTriggerSource();
-    *triggerActivation = getTriggerActivation();
+    *triggerSelector = GetTriggerSelector();
+    *triggerMode = GetTriggerMode();
+    *triggerSource = GetTriggerSource();
+    *triggerActivation = GetTriggerActivation();
 }
 
 ///***************************Trigger CONFIG End *****************************///
 
 ///***************************Exposure CONFIG Start***************************///
-void Camera::setExposureMode(ExposureModeEnums triggerActivation )
+void Camera::SetExposureMode(ExposureModeEnums triggerActivation )
 {
     m_camera->ExposureMode.SetValue( triggerActivation );
 }
 
-ExposureModeEnums Camera::getExposureMode()
+ExposureModeEnums Camera::GetExposureMode()
 {
     return m_camera->ExposureMode.GetValue();
 }
 
-void Camera::setExposureAuto(ExposureAutoEnums triggerActivation )
+void Camera::SetExposureAuto(ExposureAutoEnums triggerActivation )
 {
     m_camera->ExposureAuto.SetValue( triggerActivation );
 }
 
-ExposureAutoEnums Camera::getExposureAuto()
+ExposureAutoEnums Camera::GetExposureAuto()
 {
     return m_camera->ExposureAuto.GetValue();
 }
 
-void Camera::setExposureTime( double time )
+void Camera::SetExposureTime( double time )
 {
     m_camera->ExposureTimeAbs.SetValue( time );
 }
 
-double Camera::getExposureTime()
+double Camera::GetExposureTime()
 {
     return m_camera->ExposureTimeAbs.GetValue();
 }
 
-QImage Camera::ShotImageOne( )
+QPixmap Camera::ShotImageOne( )
 {
     if( true == m_camera->IsGrabbing() ){
         m_camera->StopGrabbing();
@@ -244,15 +262,55 @@ QImage Camera::ShotImageOne( )
     if (cGrabResultPtr->GrabSucceeded())
     {
         cImageFormatConverter.Convert(cPylonImage, cGrabResultPtr);
-        cv::Mat openCvImage= cv::Mat(cGrabResultPtr->GetHeight(), cGrabResultPtr->GetWidth(), CV_8UC3, (uint8_t *) cPylonImage.GetBuffer());
-        cvtColor(openCvImage, openCvImage, CV_BGR2RGB);
-        return QImage( openCvImage.data, openCvImage.cols, \
-                             openCvImage.rows, openCvImage.step, \
-                             QImage::Format_RGB888);
+        cv::Mat openCvImage= cv::Mat(cGrabResultPtr->GetHeight(),
+                                     cGrabResultPtr->GetWidth(),
+                                     CV_8UC1,
+                                     (uint8_t *) cPylonImage.GetBuffer());
+        ///lwj  ???直接返回qImage错误
+        /// 直接返回qImage对象在外部调用后的图像不正常，先以QPixmap类型返回
+        QImage qImage( openCvImage.data, \
+                       openCvImage.cols, \
+                       openCvImage.rows, \
+                       openCvImage.step, \
+                       QImage::Format_Mono);
+        QPixmap pix = QPixmap::fromImage(qImage);
+        qDebug("ShotImageOne Successful");
+        return pix;
     }else{
         qDebug("ShotImageOne Fail");
         qDebug(cGrabResultPtr->GetErrorDescription());
-        return QImage();
+        return QPixmap();
+    }
+}
+
+bool Camera::ShotImageOne( cv::Mat *pMat )
+{
+    if( NULL == pMat)
+    {
+        return CAMERA_FAIL;
+    }
+    if( true == m_camera->IsGrabbing() ){
+        m_camera->StopGrabbing();
+    }
+    CGrabResultPtr cGrabResultPtr;
+    CImageFormatConverter cImageFormatConverter;
+    cImageFormatConverter.OutputPixelFormat = PixelType_BGR8packed;
+    CPylonImage cPylonImage;
+    m_camera->StartGrabbing(1,GrabStrategy_LatestImageOnly);
+    m_camera->RetrieveResult( 5000, cGrabResultPtr, TimeoutHandling_Return);
+    if (cGrabResultPtr->GrabSucceeded())
+    {
+        cImageFormatConverter.Convert(cPylonImage, cGrabResultPtr);
+        qDebug("ShotImageOne Successful");
+        *pMat = cv::Mat(cGrabResultPtr->GetHeight(),
+                       cGrabResultPtr->GetWidth(),
+                       CV_8UC1,
+                       (uint8_t *) cPylonImage.GetBuffer());
+        return CAMERA_OK;
+    }else{
+        qDebug("ShotImageOne Fail");
+        qDebug(cGrabResultPtr->GetErrorDescription());
+        return CAMERA_FAIL;
     }
 }
 
@@ -261,9 +319,30 @@ void Camera::ShotImageContinue( )
 
 }
 
-void Camera::SaveImageOne( )
+void Camera::SaveImageOne( QString qsImagePath )
 {
-
+    if( true == m_camera->IsGrabbing() ){
+        m_camera->StopGrabbing();
+    }
+    CGrabResultPtr cGrabResultPtr;
+    CImageFormatConverter cImageFormatConverter;
+    cImageFormatConverter.OutputPixelFormat = PixelType_BGR8packed;
+    CPylonImage cPylonImage;
+    m_camera->StartGrabbing(1,GrabStrategy_LatestImageOnly);
+    m_camera->RetrieveResult( 5000, cGrabResultPtr, TimeoutHandling_Return);
+    if (cGrabResultPtr->GrabSucceeded())
+    {
+        cImageFormatConverter.Convert(cPylonImage, cGrabResultPtr);
+        cv::Mat openCvImage= cv::Mat(cGrabResultPtr->GetHeight(),
+                                     cGrabResultPtr->GetWidth(),
+                                     CV_8UC1,
+                                     (uint8_t *) cPylonImage.GetBuffer());
+        cv::imwrite(qsImagePath.toStdString(), openCvImage);
+        qDebug("SaveImageOne Successful");
+    }else{
+        qDebug("SaveImageOne Fail");
+        qDebug(cGrabResultPtr->GetErrorDescription());
+    }
 }
 
 void Camera::SaveImageContinue( )
@@ -271,3 +350,22 @@ void Camera::SaveImageContinue( )
 
 }
 
+void Camera::SetFilePath(QString qsFilePath)
+{
+    this->qsFilePath = qsFilePath;
+}
+
+QString Camera::GetFilePath()
+{
+    return this->qsFilePath;
+}
+
+void Camera::SetFilePrefix(QString qsFilePrefix)
+{
+    this->qsFilePrefix = qsFilePrefix;
+}
+
+QString Camera::GetFilePrefix()
+{
+    return this->qsFilePrefix;
+}

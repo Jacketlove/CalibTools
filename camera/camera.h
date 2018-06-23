@@ -11,71 +11,86 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <QDebug>
 #include <QImage>
-
+#include <QDir>
+#include <QPixmap>
 #define CAMERA_OK   1
 #define CAMERA_FAIL 0
 
 using namespace cv;
 using namespace Pylon;
-using namespace Basler_GigECamera;
+
+typedef Pylon::CBaslerGigEInstantCamera Camera_t;
+using namespace Basler_GigECameraParams;
 
 class Camera
 {
 public:
     Camera();
+    ~Camera();
     int  Open();
     bool IsOpen();
     int  Close();
 
-    void setGainAuto(GainAutoEnums gainAuto);
-    GainAutoEnums GetGainAuto( );
-    void setGainSelector(GainSelectorEnums gainAuto);
+    void SetGainAuto(GainAutoEnums gainAuto);
+    GainAutoEnums GetGainAuto();
+    void SetGainSelector(GainSelectorEnums gainAuto);
     GainSelectorEnums GetGainSelector();
 
-    void setWidth(int64_t width);
-    int64_t getWidth();
-    void setHeight(int64_t height);
-    int64_t getHeight();
-    void setOffsetX(int64_t offsetX);
-    int64_t getOffsetX();
-    void setOffsetY(int64_t offsetY);
-    int64_t getOffsetY();
+    void SetWidth(int64_t width);
+    int64_t GetWidth();
+    void SetHeight(int64_t height);
+    int64_t GetHeight();
+    void SetOffsetX(int64_t offsetX);
+    int64_t GetOffsetX();
+    void SetOffsetY(int64_t offsetY);
+    int64_t GetOffsetY();
 
-    void setTriggerSelector(TriggerSelectorEnums triggerSelector);
-    TriggerSelectorEnums getTriggerSelector();
-    void setTriggerMode(TriggerModeEnums triggerSelector);
-    TriggerModeEnums getTriggerMode();
-    void setTriggerSource(TriggerSourceEnums triggerSource);
-    TriggerSourceEnums getTriggerSource();
-    void setTriggerActivation(TriggerActivationEnums triggerActivation);
-    TriggerActivationEnums getTriggerActivation();
-    void setTrigger(TriggerSelectorEnums triggerSelector,
+    void SetTriggerSelector(TriggerSelectorEnums triggerSelector);
+    TriggerSelectorEnums GetTriggerSelector();
+    void SetTriggerMode(TriggerModeEnums triggerSelector);
+    TriggerModeEnums GetTriggerMode();
+    void SetTriggerSource(TriggerSourceEnums triggerSource);
+    TriggerSourceEnums GetTriggerSource();
+    void SetTriggerActivation(TriggerActivationEnums triggerActivation);
+    TriggerActivationEnums GetTriggerActivation();
+    void SetTrigger(TriggerSelectorEnums triggerSelector,
                     TriggerModeEnums triggerMode,
                     TriggerSourceEnums triggerSource,
                     TriggerActivationEnums triggerActivation);
-    void getTrigger(TriggerSelectorEnums *triggerSelector,
+    void GetTrigger(TriggerSelectorEnums *triggerSelector,
                     TriggerModeEnums *triggerMode,
                     TriggerSourceEnums *triggerSource,
                     TriggerActivationEnums *triggerActivation);
 
-    void setExposureMode(ExposureModeEnums triggerActivation);
-    ExposureModeEnums getExposureMode();
-    void setExposureAuto(ExposureAutoEnums triggerActivation);
-    ExposureAutoEnums getExposureAuto();
-    void setExposureTime(double time);
-    double getExposureTime();
+    void SetExposureMode(ExposureModeEnums triggerActivation);
+    ExposureModeEnums GetExposureMode();
+    void SetExposureAuto(ExposureAutoEnums triggerActivation);
+    ExposureAutoEnums GetExposureAuto();
+    void SetExposureTime(double time);
+    double GetExposureTime();
 
-    QImage ShotImageOne( );
+    QPixmap ShotImageOne();
+    bool ShotImageOne(cv::Mat *pMat);
     void ShotImageContinue();
-    void SaveImageOne();
+    void SaveImageOne( QString qsImagePath );
     void SaveImageContinue();
 
 
+    void SetFilePath(QString qsFilePath);
+    QString GetFilePath();
+    void SetFilePrefix(QString qsFilePrefix);
+    QString GetFilePrefix();
+
+
 private:
-    CBaslerGigEInstantCamera *m_camera;
-    bool m_isOpenAcquire;   ///< 是否开始采集
-    bool m_isOpen;          ///< 是否打开摄像头
+    Camera_t *m_camera;
     QSize m_size;
+
+    ///保存图片路径
+    QString qsFilePath;
+    ///保存图片前缀
+    QString qsFilePrefix;
+
 };
 
 #endif // CAMERA_H

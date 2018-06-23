@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/action">
+        <file>icons/ContinuousShot.png</file>
+        <file>icons/get_info_32x32.png</file>
+        <file>icons/info.png</file>
+        <file>icons/OneShot.png</file>
+        <file>icons/play_32x32.png</file>
+        <file>icons/Preview_32x32.png</file>
+        <file>icons/refresh_32x32.png</file>
+        <file>icons/settings_32x32.png</file>
+        <file>icons/相机黄.png</file>
+        <file>icons/相机绿.png</file>
+    </qresource>
+</RCC>
