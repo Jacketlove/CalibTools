@@ -30,6 +30,8 @@ public:
     QAction *actionCloseCamera;
     QAction *actionConfigCamera;
     QAction *actionSingleShot;
+    QAction *actionMotionControlOpen;
+    QAction *actionMotionControlClose;
     QWidget *centralWidget;
     QLabel *lblImage;
     QMenuBar *menuBar;
@@ -44,13 +46,13 @@ public:
         actionOpenCamera = new QAction(MainWindow);
         actionOpenCamera->setObjectName(QStringLiteral("actionOpenCamera"));
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/action/icons/\347\233\270\346\234\272\351\273\204.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/action/icons/\347\233\270\346\234\272\347\273\277.png"), QSize(), QIcon::Normal, QIcon::Off);
         icon.addFile(QString::fromUtf8(":/action/icons/\347\233\270\346\234\272\347\273\277.png"), QSize(), QIcon::Normal, QIcon::On);
         actionOpenCamera->setIcon(icon);
         actionCloseCamera = new QAction(MainWindow);
         actionCloseCamera->setObjectName(QStringLiteral("actionCloseCamera"));
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/action/icons/\347\233\270\346\234\272\347\273\277.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/action/icons/\347\233\270\346\234\272\351\273\204.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionCloseCamera->setIcon(icon1);
         actionConfigCamera = new QAction(MainWindow);
         actionConfigCamera->setObjectName(QStringLiteral("actionConfigCamera"));
@@ -62,6 +64,16 @@ public:
         QIcon icon3;
         icon3.addFile(QStringLiteral(":/action/icons/OneShot.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionSingleShot->setIcon(icon3);
+        actionMotionControlOpen = new QAction(MainWindow);
+        actionMotionControlOpen->setObjectName(QStringLiteral("actionMotionControlOpen"));
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/action/icons/\350\277\236\346\216\245.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMotionControlOpen->setIcon(icon4);
+        actionMotionControlClose = new QAction(MainWindow);
+        actionMotionControlClose->setObjectName(QStringLiteral("actionMotionControlClose"));
+        QIcon icon5;
+        icon5.addFile(QString::fromUtf8(":/action/icons/\346\226\255\345\274\200\351\223\276\346\216\245.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionMotionControlClose->setIcon(icon5);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         lblImage = new QLabel(centralWidget);
@@ -84,6 +96,9 @@ public:
         mainToolBar->addAction(actionConfigCamera);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionSingleShot);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(actionMotionControlOpen);
+        mainToolBar->addAction(actionMotionControlClose);
 
         retranslateUi(MainWindow);
 
@@ -103,6 +118,8 @@ public:
 #endif // QT_NO_SHORTCUT
         actionConfigCamera->setText(QApplication::translate("MainWindow", "\347\233\270\346\234\272\351\205\215\347\275\256", nullptr));
         actionSingleShot->setText(QApplication::translate("MainWindow", "\346\213\215\346\221\204\345\215\225\345\274\240", nullptr));
+        actionMotionControlOpen->setText(QApplication::translate("MainWindow", "\350\277\236\346\216\245\350\277\220\345\212\250\346\216\247\345\210\266\345\215\241", nullptr));
+        actionMotionControlClose->setText(QApplication::translate("MainWindow", "\345\205\263\351\227\255\350\277\220\345\212\250\346\216\247\345\210\266\345\215\241", nullptr));
         lblImage->setText(QString());
     } // retranslateUi
 

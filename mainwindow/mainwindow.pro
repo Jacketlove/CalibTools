@@ -64,8 +64,24 @@ LIBS += $${OPENCV_PATH}\build\x64\vc15\lib\opencv_world341.lib
 }
 #--------------------------------------------Opencv End---------------------------------------
 
+#--------------------------------------------Motion-------------------------------------------
+CONFIG(debug,debug|release) {
+LIBS += $$PWD/../motionControl/motion/lib/Motion_Drvd.lib
+}
+else {
+LIBS += $$PWD/../motionControl/motion/lib/Motion_Drv.lib
+}
+
+INCLUDEPATH += \
+    $$PWD/../motionControl/motion/include/
+#----------------------------------------------------------------------------------------------
+
 #--------------------------------------------Camera-------------------------------------------
 INCLUDEPATH += $$PWD/../camera
 LIBS += $$PWD\..\lib\camera.lib
-
 #--------------------------------------------Camera End---------------------------------------
+
+#--------------------------------------------MotionControl------------------------------------
+INCLUDEPATH += $$PWD/../motionControl
+LIBS += $$PWD\..\lib\motionControl.lib
+#--------------------------------------------MotionControl End--------------------------------

@@ -1,0 +1,6 @@
+ >>>>>>>>>> Comm_Init
+No CF.
+Cann't OPEN CH365 device[0].
+CH365 Init Finish
+
+ASSERT[209](0) Failed in file motion_comm.c:428

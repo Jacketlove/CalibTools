@@ -10,5 +10,7 @@
         <file>icons/settings_32x32.png</file>
         <file>icons/相机黄.png</file>
         <file>icons/相机绿.png</file>
+        <file>icons/断开链接.png</file>
+        <file>icons/连接.png</file>
     </qresource>
 </RCC>

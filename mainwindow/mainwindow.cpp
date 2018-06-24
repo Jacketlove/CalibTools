@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->actionOpenCamera->setEnabled(true);
     ui->actionCloseCamera->setEnabled(false);
+    ui->actionMotionControlOpen->setEnabled(true);
+    ui->actionMotionControlClose->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -66,4 +68,28 @@ void MainWindow::on_actionSingleShot_triggered()
     gigECamera.SaveImageOne(QString("1111111.bmp"));
 //    ui->lblImage->setPixmap(qPixmap);
 //    ui->lblImage->resize(ui->lblImage->pixmap()->size());
+}
+
+void MainWindow::on_actionMotionControlOpen_triggered()
+{
+    MotionControlFactory *pmotionControlFactory =  MotionControlFactory::GetInstance();
+    if( EN_MOTIONCONTROL_OK == pmotionControlFactory->CreateMotionControl() )
+    {
+        if( EN_MOTIONCONTROL_OK == pmotionControlFactory->GetMotionControl(0, motionControl))
+        {
+            ui->actionMotionControlOpen->setEnabled(false);
+            ui->actionMotionControlClose->setEnabled(true);
+            qDebug("MotionControl Open Successful");
+            return;
+        }
+    }
+    qDebug("MotionControl Open Fail");
+}
+
+void MainWindow::on_actionMotionControlClose_triggered()
+{
+    MotionControlFactory *pmotionControlFactory = MotionControlFactory::GetInstance();
+    pmotionControlFactory->DeleteMotionControl();
+    ui->actionMotionControlOpen->setEnabled(true);
+    ui->actionMotionControlClose->setEnabled(false);
 }

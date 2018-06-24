@@ -50,13 +50,16 @@
    <addaction name="actionConfigCamera"/>
    <addaction name="separator"/>
    <addaction name="actionSingleShot"/>
+   <addaction name="separator"/>
+   <addaction name="actionMotionControlOpen"/>
+   <addaction name="actionMotionControlClose"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpenCamera">
    <property name="icon">
     <iconset resource="icon.qrc">
-     <normaloff>:/action/icons/相机黄.png</normaloff>
-     <normalon>:/action/icons/相机绿.png</normalon>:/action/icons/相机黄.png</iconset>
+     <normaloff>:/action/icons/相机绿.png</normaloff>
+     <normalon>:/action/icons/相机绿.png</normalon>:/action/icons/相机绿.png</iconset>
    </property>
    <property name="text">
     <string>打开相机</string>
@@ -68,7 +71,7 @@
   <action name="actionCloseCamera">
    <property name="icon">
     <iconset resource="icon.qrc">
-     <normaloff>:/action/icons/相机绿.png</normaloff>:/action/icons/相机绿.png</iconset>
+     <normaloff>:/action/icons/相机黄.png</normaloff>:/action/icons/相机黄.png</iconset>
    </property>
    <property name="text">
     <string>关闭相机</string>
@@ -93,6 +96,24 @@
    </property>
    <property name="text">
     <string>拍摄单张</string>
+   </property>
+  </action>
+  <action name="actionMotionControlOpen">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/action/icons/连接.png</normaloff>:/action/icons/连接.png</iconset>
+   </property>
+   <property name="text">
+    <string>连接运动控制卡</string>
+   </property>
+  </action>
+  <action name="actionMotionControlClose">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/action/icons/断开链接.png</normaloff>:/action/icons/断开链接.png</iconset>
+   </property>
+   <property name="text">
+    <string>关闭运动控制卡</string>
    </property>
   </action>
  </widget>

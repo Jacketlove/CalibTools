@@ -13,8 +13,8 @@
 #include <QImage>
 #include <QDir>
 #include <QPixmap>
-#define CAMERA_OK   1
-#define CAMERA_FAIL 0
+#define CAMERA_OK   0
+#define CAMERA_FAIL 1
 
 using namespace cv;
 using namespace Pylon;
